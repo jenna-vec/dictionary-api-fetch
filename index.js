@@ -4,6 +4,7 @@ const inputField = document.querySelector('#input');
 const submit = document.querySelector('#submit');
 const responseField = document.querySelector('#responseField');
 
+/* .then() version
 const getDefinition = () => {
     const inputWord = inputField.value;
     const endpoint = url + inputWord;
@@ -16,6 +17,23 @@ const getDefinition = () => {
     }).catch(function(error) {
         console.log('Fetch Error:', error);
     });
+}
+*/
+
+//ES8
+const getDefinition = async () => {
+    const inputWord = inputField.value;
+    const endpoint = url + inputWord;
+    try {
+        const response = await fetch(endpoint);
+        if(response.ok) {
+            const jsonResponse = await response.json();
+            console.log(jsonResponse);
+            renderResponse(jsonResponse);
+        }
+    } catch(error) {
+        console.log('Fetch Error: ' + error);
+    }
 }
 
 const displaySuggestions = (event) => {
@@ -34,16 +52,17 @@ const renderResponse = (res) => {
 
     let allText = [];
     for(let i=0; i<res.length; i++) {
+        let word = res[i].word;
         let partOfSpeech = res[i].meanings[0].partOfSpeech;
         let definitions = res[i].meanings[0].definitions;
         let listA = [];
     
         for(let j = 0; j < definitions.length; j++){
-            listA.push(`<sup>${j}. </sup><span>${definitions[j].definition}</span></br>`);
+            listA.push(`<ul>${definitions[j].definition}</ul>`);
         }
         listA = listA.join("");
         
-        allText.push(`<i>${partOfSpeech}:</i></br> ${listA}</br>`)
+        allText.push(`<h3>${word}<sup>${i+1}</sup></h3><i>${partOfSpeech}:</i> ${listA}</br></br>`)
     }
 
     allText = allText.join("");
